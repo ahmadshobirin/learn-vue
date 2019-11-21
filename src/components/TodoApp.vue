@@ -133,14 +133,14 @@ export default {
         },
 
         doneEdit(todo){
+            if(todo.title.trim() == ''){
+                todo.title = this.cacheTitle
+            }
             todo.flag = false
         },
 
         exitEdit(todo){
-            if(this.todo.trim() == ''){
-                todo.title = this.cacheTitle
-            }
-
+            this.title = todo.cacheTitle,
             todo.flag = false
         },
 
