@@ -6,22 +6,8 @@
 
         <transition-group name="fade" enter-active-class="animated fadeInUp" leave-active-class="animated fadeOutDown">
 
-            <div v-for="(todo,index) in todosFiltered" :key="todo.id" class="todo-item">
-                <div class="todo-item-group">
-
-                    <input type="checkbox" v-model="todo.completed">
-
-                <div class="todo-item-label" @dblclick="edit(todo)" v-if="!todo.flag" :class="{ completed : todo.completed }">
-                    {{todo.title}}
-                    </div>
-
-                <input v-else type="text" v-model="todo.title" class="todo-item-input" @blur="doneEdit(todo)" @keyup.enter="doneEdit(todo)" @keyup.esc="exitEdit(todo)">
-                </div>
-
-                <div class="remove-item" @click="removeTodo(index)">
-                    &times;
-                </div>
-            </div>
+            <todo-item v-for="(todo,index) in todosFiltered" :key="todo.id" :index="index" :todo="todo" :checkAll="!anyRemaining" @removeTodo="removeTodo" @finishedEdit="finishedEdit">
+            </todo-item>
 
         </transition-group>
 
@@ -51,8 +37,13 @@
 </template>
 
 <script>
+import TodoItem from './TodoItem'
+
 export default {
     name : "todo-app",
+    components:{
+        TodoItem
+    },
     data(){
         return {
             msg: "Todos page Here!",
@@ -101,14 +92,6 @@ export default {
         }
     },
 
-    directives: {
-        focus: {
-        inserted: function (el) {
-                el.focus()
-            }
-        }
-    },
-
     methods:{
         addTodo(){
             //validation
@@ -127,25 +110,12 @@ export default {
             this.newIdForTodo++
         },
 
-        edit(todo){
-            this.cacheTitle = todo.title,
-            todo.flag = true
-        },
-
-        doneEdit(todo){
-            if(todo.title.trim() == ''){
-                todo.title = this.cacheTitle
-            }
-            todo.flag = false
-        },
-
-        exitEdit(todo){
-            this.title = todo.cacheTitle,
-            todo.flag = false
-        },
-
         removeTodo(index){
             this.todos.splice(index,1);
+        },
+
+        finishedEdit(data){
+            this.todos.splice(data.index, 1, data.todo)
         },
 
         checkAllTodos(){
